@@ -1,0 +1,9 @@
+[06-May-2023 20:11:34 Asia/Jerusalem] PHP Deprecated:  Required parameter $table follows optional parameter $user in /home/gohqlake/public_html/app/Notifications/CallWaiter.php on line 24
+[06-May-2023 20:11:34 Asia/Jerusalem] PHP Deprecated:  Required parameter $msg follows optional parameter $user in /home/gohqlake/public_html/app/Notifications/CallWaiter.php on line 24
+[07-May-2023 22:08:25 Asia/Jerusalem] PHP Deprecated:  Required parameter $table follows optional parameter $user in /home/gohqlake/public_html/app/Notifications/CallWaiter.php on line 24
+[07-May-2023 22:08:25 Asia/Jerusalem] PHP Deprecated:  Required parameter $msg follows optional parameter $user in /home/gohqlake/public_html/app/Notifications/CallWaiter.php on line 24
+[14-May-2023 12:40:55 Asia/Jerusalem] PHP Deprecated:  Required parameter $table follows optional parameter $user in /home/gohqlake/public_html/app/Notifications/CallWaiter.php on line 24
+[14-May-2023 12:40:55 Asia/Jerusalem] PHP Deprecated:  Required parameter $msg follows optional parameter $user in /home/gohqlake/public_html/app/Notifications/CallWaiter.php on line 24
+[31-Jul-2023 17:25:01 Asia/Jerusalem] PHP Fatal error:  Cannot use Intervention\Image\Facades\Image as Image because the name is already in use in /home/gohqlake/public_html/app/Http/Controllers/ItemsController.php on line 17
+[31-Jul-2023 17:25:07 Asia/Jerusalem] PHP Fatal error:  Cannot use Intervention\Image\Facades\Image as Image because the name is already in use in /home/gohqlake/public_html/app/Http/Controllers/ItemsController.php on line 17
+[31-Jul-2023 17:25:46 Asia/Jerusalem] PHP Fatal error:  Cannot use Intervention\Image\Facades\Image as Image because the name is already in use in /home/gohqlake/public_html/app/Http/Controllers/ItemsController.php on line 17

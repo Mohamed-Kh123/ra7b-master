@@ -1,0 +1,44 @@
+/* tajawal-200 - latin */
+@font-face {
+    font-family: 'expo';
+    font-style: normal;
+    font-weight: 200;
+    src: url('../fonts/EXPOARABIC-BOLD.ttf'); /* IE9 Compat Modes */
+  }
+Path Intellisense
+  /* tajawal-200 - latin */
+  @font-face {
+    font-family: 'expo';
+    font-style: normal;
+    font-weight: 200;
+    src: url('../fonts/EXPOARABIC-LIGHT.TTF'); /* IE9 Compat Modes */
+  }
+  /* tajawal-400 - latin */
+  @font-face {
+    font-family: 'expo';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/EXPOARABIC-BOOK.TTF'); /* IE9 Compat Modes */
+  }
+  /* tajawal-500 - latin */
+  @font-face {
+    font-family: 'expo';
+    font-style: normal;
+    font-weight: 500;
+    src: url('../fonts/EXPOARABIC-MEDIUM.TTF'); /* IE9 Compat Modes */
+  }
+  /* tajawal-800 - latin */
+  @font-face {
+    font-family: 'expo';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/EXPOARABIC-BOLD.OTF'); /* IE9 Compat Modes */
+  }
+  /* tajawal-900 - latin */
+  @font-face {
+    font-family: 'expo';
+    font-style: normal;
+    font-weight: 600;
+    src: url('../fonts/EXPOARABIC-SEMIBOLD.TTF'); /* IE9 Compat Modes */
+
+  }
