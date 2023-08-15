@@ -9,7 +9,6 @@ use App\Items;
 use App\Plans;
 use App\Restorant;
 use Illuminate\Http\Request;
-use Image;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Services\ConfChanger;
 use Akaunting\Module\Facade as Module;
@@ -34,9 +33,9 @@ class ItemsController extends Controller
     {
         if (auth()->user()->hasRole('owner')) {
 
-            
+
             $canAdd = auth()->user()->restorant->getPlanAttribute()['canAddNewItems'];
-            
+
 
             //Change language
             ConfChanger::switchLanguage(auth()->user()->restorant);
@@ -45,7 +44,7 @@ class ItemsController extends Controller
                 $localMenuToDelete=auth()->user()->restorant->localmenus()->where('language', $_GET['remove_lang'])->first();
                 $isMenuToDeleteIsDefault=$localMenuToDelete->default.""=="1";
                 $localMenuToDelete->delete();
-                
+
                 $nextLanguageModel = auth()->user()->restorant->localmenus()->first();
                 $nextLanguage = $nextLanguageModel->language;
                 app()->setLocale($nextLanguage);
@@ -60,16 +59,16 @@ class ItemsController extends Controller
             if(isset($_GET['make_default_lang'])){
                 $newDefault=auth()->user()->restorant->localmenus()->where('language', $_GET['make_default_lang'])->first();
                 $oldDefault=auth()->user()->restorant->localmenus()->where('default', "1")->first();
-                
+
                 if($oldDefault&&$oldDefault->language!=$_GET['make_default_lang']){
                     $oldDefault->default=0;
                     $oldDefault->update();
                 }
                 $newDefault->default=1;
                 $newDefault->update();
-                
-                
-                
+
+
+
             }
 
             $currentEnvLanguage = isset(config('config.env')[2]['fields'][0]['data'][config('app.locale')]) ? config('config.env')[2]['fields'][0]['data'][config('app.locale')] : 'UNKNOWN';
@@ -79,9 +78,9 @@ class ItemsController extends Controller
             ConfChanger::switchCurrency(auth()->user()->restorant);
             $defaultLng=auth()->user()->restorant->localmenus->where('default','1')->first();
 
-            
 
-            //Since 2.1.7 - there is sorting. 
+
+            //Since 2.1.7 - there is sorting.
             $categories=auth()->user()->restorant->categories;
 
             //If first item order starts with 0
@@ -144,7 +143,7 @@ class ItemsController extends Controller
             $defVat=$resto->getConfig('default_tax_value',0);
         }
         $item->vat=$defVat;
-        
+
         if ($request->hasFile('item_image')) {
             $image = $request->file('item_image');
             $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -186,7 +185,7 @@ class ItemsController extends Controller
     {
         //if item belongs to owner restorant menu return view
         if (auth()->user()->hasRole('owner') && $item->category->restorant->id == auth()->user()->restorant->id || auth()->user()->hasRole('admin')) {
-            
+
             //Change currency
             ConfChanger::switchCurrency($item->category->restorant);
 
@@ -199,9 +198,9 @@ class ItemsController extends Controller
                 }
             }
 
-            
-            
-            
+
+
+
             return view('items.edit',
             [
                 'extraViews'=>$extraViews,
@@ -258,7 +257,7 @@ class ItemsController extends Controller
             }
 
             //Set the flag for the system
-            $item->enable_system_variants=$doWoHave_enable_system_variants; 
+            $item->enable_system_variants=$doWoHave_enable_system_variants;
 
             //When we have System Variables
             if($item->enable_system_variants==1){
@@ -270,7 +269,7 @@ class ItemsController extends Controller
                     //And recreate once  again - with new item price
                     $item->makeAllMissingVariants($item->price);
                 }
-                
+
             }else{
                 //Delete all system variants - we don't need system variables
                 $item->systemvariants()->forceDelete();
