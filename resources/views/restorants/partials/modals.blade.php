@@ -15,7 +15,7 @@
                                 <img id="modalImg" src="" width="295px" height="200px">
                             </div>
                             <div class="col-sm col-md col-lg col-lg" id="modalItemDetailsPart">
-                                <input id="modalID" type="hidden"></input>
+                                <input id="modalID" type="hidden" />
                                 <span id="modalPrice" class="new-price"></span>
                                 <p id="modalDescription"></p>
                                 <div id="variants-area">
@@ -40,12 +40,12 @@
                                                     min="1"
                                                     step="1"
                                                     onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                                                    name="quantity" 
-                                                    id="quantity" 
-                                                    class="form-control form-control-alternative" 
-                                                    placeholder="1" 
-                                                    value="1" 
-                                                    required 
+                                                    name="quantity"
+                                                    id="quantity"
+                                                    class="form-control form-control-alternative"
+                                                    placeholder="1"
+                                                    value="1"
+                                                    required
                                                     autofocus
                                             >
                                     </div>
@@ -54,7 +54,7 @@
                                             <button class="btn btn-primary" v-on:click='addToCartAct'>{{ __('Add To Cart') }}</button>
                                         </div>
                                     </div>
-                                   
+
                                 </div>
                                @endif
                                 <!-- Inform if closed -->
@@ -121,7 +121,7 @@
             <div class="modal-body p-0">
                 <div class="card">
                     <div class="card-header bg-white text-center">
-                        <img class="rounded img-center" src="{{ $restorant->icon }}" width="90px" height="90px"></img>
+                        <img class="rounded img-center" src="{{ $restorant->icon }}" width="90px" height="90px" />
                         <h4 class="heading mt-4">{{ $restorant->name }} &nbsp;@if(count($restorant->ratings))<span><i class="fa fa-star" style="color: #dc3545"></i> <strong>{{ number_format($restorant->averageRating, 1, '.', ',') }} <span class="small">/ 5 ({{ count($restorant->ratings) }})</strong></span></span>@endif</h4>
                         <p class="description">{{ $restorant->description }}</p>
                         @if(!empty($openingTime) && !empty($closingTime))
@@ -161,7 +161,7 @@
                                     <br/>
                                     <h5>{{ count($restorant->ratings) }} {{ count($restorant->ratings) == 1 ? __('Review') : __('Reviews')}}</h5>
                                     <hr />
-                                    
+
                                     @foreach($restorant->ratings as $rating)
                                         <div class="strip">
                                             <span class="res_title"><b>{{ $rating->user->name }}</b></span><span class="float-right"><i class="fa fa-star" style="color: #dc3545"></i> <strong>{{ number_format($rating->rating, 1, '.', ',') }} <span class="small">/ 5</strong></span></span><br />

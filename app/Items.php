@@ -8,7 +8,10 @@ use App\Models\TranslateAwareModel;
 use App\Models\Variants;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class Items extends TranslateAwareModel
 {
@@ -18,35 +21,28 @@ class Items extends TranslateAwareModel
     protected $table = 'items';
     protected $appends = ['logom', 'icon', 'short_description'];
     protected $fillable = ['name', 'description', 'image', 'price','discounted_price', 'category_id', 'vat','enable_system_variants'];
-    protected $imagePath = '/uploads/restorants/';
+    protected $imagePath = 'storage/uploads/images/';
 
-    protected function getImge($imageValue, $default, $version = '_large.jpg')
+    protected function getImge()
     {
-        if ($imageValue == '' || $imageValue == null) {
-            //No image
-            return $default;
-        } else {
-            if (strpos($imageValue, 'http') !== false) {
-                //Have http
-                if (
-                    strpos($imageValue, '.jpg') !== false || 
-                    strpos($imageValue, '.jpeg') !== false || 
-                    strpos($imageValue, '.png') !== false || 
-                    strpos($imageValue, 'api.tinify.com') !== false ||
-                    strpos($imageValue, 'amazonaws.com') !== false ||
-                    strpos($imageValue, 'googleapis.com') !== false  
-                ) {
-                    //Has extension
-                    return $imageValue;
-                } else {
-                    //No extension
-                    return $imageValue.$version;
-                }
-            } else {
-                //Local image
-                return (config('settings.image_store_location').$this->imagePath.$imageValue).$version;
+        if ($this->image) {
+            $path = storage_path("app/public/uploads/images/$this->image");
+            $exists = File::exists($path);
+            if (!$exists) {
+                return asset('storage/null.jpg');
             }
+
+            $image = Image::make($path);
+
+            $response = Response::make($image->encode($image->mime), 200);
+            $response->header("CF-Cache-Status", 'HIF');
+            $response->header("Cache-Control", 'max-age=604800, public');
+            $response->header("Content-Type", $image->mime);
+
+            // Generate a URL for the image
+            return asset("storage/uploads/images/$this->image");
         }
+        return asset('storage/null.jpg');
     }
 
     public function substrwords($text, $chars, $end = '...')
@@ -63,12 +59,34 @@ class Items extends TranslateAwareModel
 
     public function getLogomAttribute()
     {
-        return $this->getImge($this->image, config('global.restorant_details_image'));
+        return $this->getImge();
     }
 
     public function getIconAttribute()
     {
-        return $this->getImge($this->image, config('global.restorant_details_image'), '_thumbnail.jpg');
+        return $this->getImge();
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            $path = storage_path("app/public/uploads/images/$this->image");
+            $exists = File::exists($path);
+            if (!$exists) {
+                return asset('storage/null.jpg');
+            }
+
+            $image = Image::make($path);
+
+            $response = Response::make($image->encode($image->mime), 200);
+            $response->header("CF-Cache-Status", 'HIF');
+            $response->header("Cache-Control", 'max-age=604800, public');
+            $response->header("Content-Type", $image->mime);
+
+            // Generate a URL for the image
+            return asset("storage/uploads/images/$this->image");
+        }
+        return asset('storage/null.jpg');
     }
 
     public function getItempriceAttribute()
@@ -119,7 +137,7 @@ class Items extends TranslateAwareModel
 
     public function makeAllMissingVariants($itemPrice){
         //At this moment, all system variables, should be removed
-        
+
         //The idea is to go over all the options to create the matrix
         $optionsMatrix=[];
         foreach ($this->options as $key => $option) {
@@ -134,13 +152,13 @@ class Items extends TranslateAwareModel
         foreach ($optionsMatrix as $key => $valuer) {
             array_push($regular,$valuer);
         }
-        for ($i=sizeof($regular)-1; $i>0 ; $i--) { 
+        for ($i=sizeof($regular)-1; $i>0 ; $i--) {
            foreach ($regular[$i-1] as $key => &$valueSE) {
                 $valueSE['data']=$regular[$i];
            }
         }
 
-        //Ok, now we have the matrix - 
+        //Ok, now we have the matrix -
        // print_r($regular);
         $strings=[];
         if(sizeof($regular)>0){
@@ -198,12 +216,12 @@ class Items extends TranslateAwareModel
                                                                                 }
                                                                             }
                                                                         }
-                                                                        
+
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                        
+
                                                     }
                                                 }
                                             }
@@ -216,7 +234,7 @@ class Items extends TranslateAwareModel
                 }
             }
         }
-        
+
 
 
         //Now for each variant, l
@@ -242,13 +260,13 @@ class Items extends TranslateAwareModel
         return "\"".$value['op_id']."\"".":"."\"".$value['value']."\"";
     }
 
-   
+
     public static function boot()
     {
         parent::boot();
         self::deleting(function ($model) {
             if ($model->isForceDeleting()) {
-               
+
 
                 //Delete Options
                 $model->options()->forceDelete();

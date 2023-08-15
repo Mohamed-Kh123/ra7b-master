@@ -7,19 +7,25 @@ use App\Extras;
 use App\Imports\ItemsImport;
 use App\Items;
 use App\Plans;
+use App\Repositories\Image\ImageRepository;
 use App\Restorant;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Services\ConfChanger;
 use Akaunting\Module\Facade as Module;
 use App\Models\Allergens;
-use Intervention\Image\Facades\Image;
 
 class ItemsController extends Controller
 {
-    private $imagePath = 'uploads/restorants/';
+    protected $imageRepository;
 
-    public function reorderCategories(Categories $up){
+    public function __construct(ImageRepository $imageRepository)
+    {
+        $this->imageRepository = $imageRepository;
+    }
+
+    public function reorderCategories(Categories $up)
+    {
         $up->moveOrderUp();
         return redirect()->route('items.index')->withStatus(__('Sort order updated'));
     }
@@ -41,8 +47,8 @@ class ItemsController extends Controller
             ConfChanger::switchLanguage(auth()->user()->restorant);
 
             if (isset($_GET['remove_lang']) && auth()->user()->restorant->localmenus()->count() > 1) {
-                $localMenuToDelete=auth()->user()->restorant->localmenus()->where('language', $_GET['remove_lang'])->first();
-                $isMenuToDeleteIsDefault=$localMenuToDelete->default.""=="1";
+                $localMenuToDelete = auth()->user()->restorant->localmenus()->where('language', $_GET['remove_lang'])->first();
+                $isMenuToDeleteIsDefault = $localMenuToDelete->default . "" == "1";
                 $localMenuToDelete->delete();
 
                 $nextLanguageModel = auth()->user()->restorant->localmenus()->first();
@@ -50,23 +56,22 @@ class ItemsController extends Controller
                 app()->setLocale($nextLanguage);
                 session(['applocale_change' => $nextLanguage]);
 
-                if($isMenuToDeleteIsDefault){
-                    $nextLanguageModel->default=1;
+                if ($isMenuToDeleteIsDefault) {
+                    $nextLanguageModel->default = 1;
                     $nextLanguageModel->update();
                 }
             }
 
-            if(isset($_GET['make_default_lang'])){
-                $newDefault=auth()->user()->restorant->localmenus()->where('language', $_GET['make_default_lang'])->first();
-                $oldDefault=auth()->user()->restorant->localmenus()->where('default', "1")->first();
+            if (isset($_GET['make_default_lang'])) {
+                $newDefault = auth()->user()->restorant->localmenus()->where('language', $_GET['make_default_lang'])->first();
+                $oldDefault = auth()->user()->restorant->localmenus()->where('default', "1")->first();
 
-                if($oldDefault&&$oldDefault->language!=$_GET['make_default_lang']){
-                    $oldDefault->default=0;
+                if ($oldDefault && $oldDefault->language != $_GET['make_default_lang']) {
+                    $oldDefault->default = 0;
                     $oldDefault->update();
                 }
-                $newDefault->default=1;
+                $newDefault->default = 1;
                 $newDefault->update();
-
 
 
             }
@@ -76,30 +81,29 @@ class ItemsController extends Controller
 
             //Change currency
             ConfChanger::switchCurrency(auth()->user()->restorant);
-            $defaultLng=auth()->user()->restorant->localmenus->where('default','1')->first();
-
+            $defaultLng = auth()->user()->restorant->localmenus->where('default', '1')->first();
 
 
             //Since 2.1.7 - there is sorting.
-            $categories=auth()->user()->restorant->categories;
+            $categories = auth()->user()->restorant->categories;
 
             //If first item order starts with 0
-            if($categories->first()&&$categories->first()->order_index==0){
+            if ($categories->first() && $categories->first()->order_index == 0) {
                 Categories::setNewOrder($categories->pluck('id')->toArray());
 
                 //Re-get categories
-                $categories=auth()->user()->restorant->categories;
+                $categories = auth()->user()->restorant->categories;
             }
 
             return view('items.index', [
-                'hasMenuPDf'=>Module::has('menupdf'),
-                'canAdd'=>$canAdd,
+                'hasMenuPDf' => Module::has('menupdf'),
+                'canAdd' => $canAdd,
                 'categories' => $categories,
                 'restorant_id' => auth()->user()->restorant->id,
-                'currentLanguage'=> $currentEnvLanguage,
-                'availableLanguages'=>auth()->user()->restorant->localmenus,
-                'defaultLanguage'=>$defaultLng?$defaultLng->language:""
-                ]);
+                'currentLanguage' => $currentEnvLanguage,
+                'availableLanguages' => auth()->user()->restorant->localmenus,
+                'defaultLanguage' => $defaultLng ? $defaultLng->language : ""
+            ]);
         } else {
             return redirect()->route('orders.index')->withStatus(__('No Access'));
         }
@@ -127,7 +131,7 @@ class ItemsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -137,27 +141,15 @@ class ItemsController extends Controller
         $item->description = strip_tags($request->item_description);
         $item->price = strip_tags($request->item_price);
         $item->category_id = strip_tags($request->category_id);
-        $defVat=0;
-        $resto=$this->getRestaurant();
-        if($resto){
-            $defVat=$resto->getConfig('default_tax_value',0);
+        $defVat = 0;
+        $resto = $this->getRestaurant();
+        if ($resto) {
+            $defVat = $resto->getConfig('default_tax_value', 0);
         }
-        $item->vat=$defVat;
+        $item->vat = $defVat;
 
         if ($request->hasFile('item_image')) {
-            $image = $request->file('item_image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-
-            $img = Image::make($image->getRealPath());
-
-            // You can resize the image if needed
-             $img->resize(800, 600);
-
-            $destinationPath = public_path('uploads/restorants/');
-
-            $img->save($destinationPath . $filename);
-
-            $item->image = 'uploads/restorants/' . $filename;
+            $item->image = $this->imageRepository->upload($request->item_image);
         }
         $item->save();
 
@@ -167,7 +159,7 @@ class ItemsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -178,7 +170,7 @@ class ItemsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(Items $item)
@@ -189,27 +181,25 @@ class ItemsController extends Controller
             //Change currency
             ConfChanger::switchCurrency($item->category->restorant);
 
-            $extraViews=[];
+            $extraViews = [];
             foreach (Module::all() as $key => $module) {
-                if(is_array($module->get('menuview'))){
+                if (is_array($module->get('menuview'))) {
                     foreach ($module->get('menuview') as $key => $menu) {
-                       array_push($extraViews,$menu);
+                        array_push($extraViews, $menu);
                     }
                 }
             }
 
 
-
-
             return view('items.edit',
-            [
-                'extraViews'=>$extraViews,
-                'allergens'=>Allergens::where('post_type','allergen')->get(),
-                'item' => $item,
-                'setup'=>['items'=>$item->uservariants()->paginate(1000)],
-                'restorant' => $item->category->restorant,
-                'categories'=> $item->category->restorant->categories->pluck('name','id'),
-                'restorant_id' => $item->category->restorant->id, ]);
+                [
+                    'extraViews' => $extraViews,
+                    'allergens' => Allergens::where('post_type', 'allergen')->get(),
+                    'item' => $item,
+                    'setup' => ['items' => $item->uservariants()->paginate(1000)],
+                    'restorant' => $item->category->restorant,
+                    'categories' => $item->category->restorant->categories->pluck('name', 'id'),
+                    'restorant_id' => $item->category->restorant->id,]);
         } else {
             return redirect()->route('items.index')->withStatus(__('No Access'));
         }
@@ -218,18 +208,18 @@ class ItemsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Items $item)
     {
-        $makeVariantsRecreate=false;
+        $makeVariantsRecreate = false;
         $item->name = strip_tags($request->item_name);
         $item->description = strip_tags($request->item_description);
         $item->category_id = $request->category_id;
-        if($item->price!=strip_tags($request->item_price)){
-            $makeVariantsRecreate=true;
+        if ($item->price != strip_tags($request->item_price)) {
+            $makeVariantsRecreate = true;
         }
         $item->price = strip_tags($request->item_price);
         $item->discounted_price = strip_tags($request->discounted_price);
@@ -241,28 +231,28 @@ class ItemsController extends Controller
 
         $item->available = $request->exists('itemAvailable');
         $item->has_variants = $request->exists('has_variants');
-        if(!$item->has_variants){
-            $item->enable_system_variants=0;
+        if (!$item->has_variants) {
+            $item->enable_system_variants = 0;
 
             //Delete all system variants
             $item->systemvariants()->delete();
-        }else{
+        } else {
 
             //We have variants, but do we have system variables
-            $doWoHave_enable_system_variants=$request->exists('enable_system_variants')?1:0;
+            $doWoHave_enable_system_variants = $request->exists('enable_system_variants') ? 1 : 0;
 
             //In case value changes from no to yes, we need to recreate
-            if($item->enable_system_variants==0&&$doWoHave_enable_system_variants==1){
-                $makeVariantsRecreate=true;
+            if ($item->enable_system_variants == 0 && $doWoHave_enable_system_variants == 1) {
+                $makeVariantsRecreate = true;
             }
 
             //Set the flag for the system
-            $item->enable_system_variants=$doWoHave_enable_system_variants;
+            $item->enable_system_variants = $doWoHave_enable_system_variants;
 
             //When we have System Variables
-            if($item->enable_system_variants==1){
+            if ($item->enable_system_variants == 1) {
                 //And we do need to make recreation
-                if($makeVariantsRecreate){
+                if ($makeVariantsRecreate) {
                     //Delete all of them - since this can be a price change
                     $item->systemvariants()->forceDelete();
 
@@ -270,34 +260,17 @@ class ItemsController extends Controller
                     $item->makeAllMissingVariants($item->price);
                 }
 
-            }else{
+            } else {
                 //Delete all system variants - we don't need system variables
                 $item->systemvariants()->forceDelete();
             }
         }
 
         if ($request->hasFile('item_image')) {
-            $request->validate([
-                'item_image' => ['dimensions:max_width=2000'],
-            ]);
-            if ($request->hasFile('item_image')) {
-                $image = $request->file('item_image');
-                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-
-                $img = Image::make($image->getRealPath());
-
-                // You can resize the image if needed
-                $img->resize(800, 600);
-
-                $destinationPath = public_path('uploads/restorants/');
-
-                $img->save($destinationPath . $filename);
-
-                $item->image = 'uploads/restorants/' . $filename;
-            }
+            $item->image = $this->imageRepository->upload($request->item_image);
         }
 
-        $item->update();
+        $item->save();
 
         return redirect()->route('items.edit', $item)->withStatus(__('Item successfully updated.'));
     }
@@ -305,7 +278,7 @@ class ItemsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(Items $item)
@@ -341,7 +314,7 @@ class ItemsController extends Controller
     public function storeExtras(Request $request, Items $item)
     {
         //dd($request->all());
-        if ($request->extras_id.'' == '') {
+        if ($request->extras_id . '' == '') {
             //New
             $extras = new Extras;
             $extras->name = strip_tags($request->extras_name);
@@ -351,7 +324,7 @@ class ItemsController extends Controller
             $extras->save();
         } else {
             //Update
-            $extras = Extras::where(['id'=>$request->extras_id])->get()->first();
+            $extras = Extras::where(['id' => $request->extras_id])->get()->first();
 
             $extras->name = strip_tags($request->extras_name);
             $extras->price = strip_tags($request->extras_price);
@@ -361,7 +334,7 @@ class ItemsController extends Controller
 
         //For variants
         //Does the item of this extra have item?
-        if ($item->has_variants.'' == 1) {
+        if ($item->has_variants . '' == 1) {
             //In cas we have variants, we  need to check if this variant is for all variants, or only for selected one
             if ($request->exists('variantsSelector')) {
                 $extras->extra_for_all_variants = 0;
@@ -380,7 +353,7 @@ class ItemsController extends Controller
 
     public function editExtras(Request $request, Items $item)
     {
-        $extras = Extras::where(['id'=>$request->extras_id])->get()->first();
+        $extras = Extras::where(['id' => $request->extras_id])->get()->first();
 
         $extras->name = strip_tags($request->extras_name_edit);
         $extras->price = strip_tags($request->extras_price_edit);

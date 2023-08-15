@@ -1,16 +1,16 @@
 @extends('layouts.front', ['class' => ''])
 
 @section('extrameta')
-<title>{{ $restorant->name }}</title>
-<meta property="og:image" itemprop="image" content="{{ $restorant->logom }}">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="590">
-<meta property="og:image:height" content="400">
-<meta name="og:title" property="og:title" content="{{ $restorant->name }}">
-<meta name="description" content="{{ $restorant->description }}">
-@if (\Akaunting\Module\Facade::has('googleanalytics'))
-    @include('googleanalytics::index')
-@endif
+    <title>{{ $restorant->name }}</title>
+    <meta property="og:image" itemprop="image" content="{{ $restorant->logom }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="590">
+    <meta property="og:image:height" content="400">
+    <meta name="og:title" property="og:title" content="{{ $restorant->name }}">
+    <meta name="description" content="{{ $restorant->description }}">
+    @if (\Akaunting\Module\Facade::has('googleanalytics'))
+        @include('googleanalytics::index')
+    @endif
 @endsection
 
 
@@ -20,7 +20,8 @@
     @if (\Akaunting\Module\Facade::has('cards')&&$restorant->getConfig('enable_loyalty', false))
 
         <li class="web-menu mr-1">
-            <a href="{{ route('loyalty.landing',['alias'=>$restorant->subdomain])}}" class="btn btn-neutral btn-icon btn-cart" style="cursor:pointer;">
+            <a href="{{ route('loyalty.landing',['alias'=>$restorant->subdomain])}}"
+               class="btn btn-neutral btn-icon btn-cart" style="cursor:pointer;">
                 <span class="btn-inner--icon">
                     <i class="fa fa-id-card-o"></i>
                 </span>
@@ -28,7 +29,7 @@
             </a>
         </li>
         <li class="mobile-menu">
-            <a href="{{ route('loyalty.landing',['alias'=>$restorant->subdomain])}}" class="nav-link" >
+            <a href="{{ route('loyalty.landing',['alias'=>$restorant->subdomain])}}" class="nav-link">
                 <span class="btn-inner--icon">
                   <i class="fa fa-id-card-o"></i>
                 </span>
@@ -39,46 +40,65 @@
 @endsection
 
 @section('content')
-<?php
-    function clean($string) {
+    <?php
+    function clean($string)
+    {
         $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
 
         return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
-     }
-?>
+    }
+    ?>
 
-@include('restorants.partials.modals')
-<style>
-    .section-profile-cover{
-        height: unset;
-    }
-    @media (max-width: 500px) {
-        .section-lg{
-            padding-top: 0;
+    @include('restorants.partials.modals')
+    <style>
+        .section-profile-cover {
+            height: unset;
         }
-    }
-</style>
-{{--d-none d-md-none--}}
-    <section class="section-profile-cover section-shaped grayscale-05  d-lg-block d-lx-block" style="background-image: url({{ $restorant->coverm }})">
-      <!-- Circles background -->
-      <!--<img class="bg-image" loading="lazy" src="{{ $restorant->coverm }}" style="width: 100%;">-->
-      <!-- SVG separator -->
-      <div class="separator separator-bottom separator-skew">
-        <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg">
-          <polygon class="fill-white" points="2560 0 2560 100 0 100"></polygon>
-        </svg>
-      </div>
+
+        @media (max-width: 500px) {
+            .section-lg {
+                padding-top: 0;
+            }
+        }
+    </style>
+    {{--d-none d-md-none--}}
+    <section class="section-profile-cover section-shaped grayscale-05  d-lg-block d-lx-block"
+             style="background-image: url({{ $restorant->coverm }})">
+        <!-- Circles background -->
+        <!--<img class="bg-image" loading="lazy" src="{{ $restorant->coverm }}" style="width: 100%;">-->
+        <!-- SVG separator -->
+        <div class="separator separator-bottom separator-skew">
+            <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1"
+                 xmlns="http://www.w3.org/2000/svg">
+                <polygon class="fill-white" points="2560 0 2560 100 0 100"></polygon>
+            </svg>
+        </div>
     </section>
 
     <section class="section pt-lg-0 mb--5 mt--9 d-none d-md-none d-lg-block d-lx-block">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="title white"  <?php if($restorant->description){echo 'style="border-bottom: 1px solid #f2f2f2;"';} ?> >
-                        <h1 class="display-3 notranslate"  data-toggle="modal" data-target="#modal-restaurant-info" style="cursor: pointer; margin-top: 154px; color: #f6ac3d">{{ $restorant->name }}</h1>
-                        <p class="display-4" style="margin-top: 10px; color: #212121;" >{{ $restorant->description }}</p>
+                    <div class="title white" <?php if ($restorant->description) {
+                        echo 'style="border-bottom: 1px solid #f2f2f2;"';
+                    } ?> >
+                        <h1 class="display-3 notranslate" data-toggle="modal" data-target="#modal-restaurant-info"
+                            style="cursor: pointer; margin-top: 154px; color: #f6ac3d">{{ $restorant->name }}</h1>
+                        <p class="display-4" style="margin-top: 10px; color: #212121;">{{ $restorant->description }}</p>
 
-                        <p><i class="ni ni-watch-time"></i> @if(!empty($openingTime))<span class="closed_time">{{__('Opens')}} {{ $openingTime }}</span>@endif @if(!empty($closingTime))<span class="opened_time" style="font-weight: 400;">{{__('Opened until')}} {{ $closingTime }}</span> @endif |   @if(!empty($restorant->address))<i class="ni ni-pin-3"></i></i> <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($restorant->address) }}"><span class="notranslate">{{ $restorant->address }}</span></a>  | @endif @if(!empty($restorant->phone)) <i class="ni ni-mobile-button"></i> <a href="tel:{{$restorant->phone}}">{{ $restorant->phone }} </a> @endif</p>
+                        <p><i class="ni ni-watch-time"></i> @if(!empty($openingTime))
+                                <span class="closed_time">{{__('Opens')}} {{ $openingTime }}</span>
+                            @endif @if(!empty($closingTime))
+                                <span class="opened_time"
+                                      style="font-weight: 400;">{{__('Opened until')}} {{ $closingTime }}</span>
+                            @endif | @if(!empty($restorant->address))
+                                <i class="ni ni-pin-3"></i></i> <a target="_blank"
+                                                                   href="https://www.google.com/maps/search/?api=1&query={{ urlencode($restorant->address) }}"><span
+                                        class="notranslate">{{ $restorant->address }}</span></a>  |
+                            @endif @if(!empty($restorant->phone))
+                                <i class="ni ni-mobile-button"></i> <a
+                                    href="tel:{{$restorant->phone}}">{{ $restorant->phone }} </a>
+                            @endif</p>
                     </div>
                 </div>
             </div>
@@ -104,9 +124,24 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="title">
-                        <h1 class="display-3 text notranslate" data-toggle="modal" data-target="#modal-restaurant-info" style="cursor: pointer; color: #f6ac3d;">{{ $restorant->name }}</h1>
-                        <p class="display-4 text" style="color: #212121; font-size: 20px;">{{ $restorant->description }}</p>
-                        <p><i class="ni ni-watch-time"></i> @if(!empty($openingTime))<span class="closed_time">{{__('Opens')}} {{ $openingTime }}</span>@endif @if(!empty($closingTime))<span class="opened_time" style="font-weight: 400;">{{__('Opened until')}} {{ $closingTime }}</span> @endif   @if(!empty($restorant->address))<i class="ni ni-pin-3"></i></i> <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($restorant->address) }}" style="font-weight: 400;">{{ $restorant->address }}</a>  | @endif @if(!empty($restorant->phone)) <i class="ni ni-mobile-button"></i> <a href="tel:{{$restorant->phone}}" style="font-weight: 400;">{{ $restorant->phone }} </a> @endif</p>
+                        <h1 class="display-3 text notranslate" data-toggle="modal" data-target="#modal-restaurant-info"
+                            style="cursor: pointer; color: #f6ac3d;">{{ $restorant->name }}</h1>
+                        <p class="display-4 text"
+                           style="color: #212121; font-size: 20px;">{{ $restorant->description }}</p>
+                        <p><i class="ni ni-watch-time"></i> @if(!empty($openingTime))
+                                <span class="closed_time">{{__('Opens')}} {{ $openingTime }}</span>
+                            @endif @if(!empty($closingTime))
+                                <span class="opened_time"
+                                      style="font-weight: 400;">{{__('Opened until')}} {{ $closingTime }}</span>
+                            @endif   @if(!empty($restorant->address))
+                                <i class="ni ni-pin-3"></i></i> <a target="_blank"
+                                                                   href="https://www.google.com/maps/search/?api=1&query={{ urlencode($restorant->address) }}"
+                                                                   style="font-weight: 400;">{{ $restorant->address }}</a>
+                                |
+                            @endif @if(!empty($restorant->phone))
+                                <i class="ni ni-mobile-button"></i> <a href="tel:{{$restorant->phone}}"
+                                                                       style="font-weight: 400;">{{ $restorant->phone }} </a>
+                            @endif</p>
                     </div>
                 </div>
             </div>
@@ -118,25 +153,27 @@
         <div class="container-fluid container-restorant">
 
 
+            @if(!$restorant->categories->isEmpty())
+                <nav class="tabbable sticky" style="top: {{ config('app.isqrsaas') ? 72:80 }}px;">
+                    <ul class="nav nav-pills bg-white mb-2 p-2" style="gap: 10px">
+                        <li class="nav-item nav-item-category ">
+                            <a class="nav-link  mb-sm-3 mb-md-0 active" data-toggle="tab" role="tab"
+                               href="">{{ __('All categories') }}</a>
+                        </li>
+                        @foreach ( $restorant->categories as $key => $category)
+                            @if(!$category->aitems->isEmpty())
+                                <li class="nav-item nav-item-category"
+                                    id="{{ 'cat_'.clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">
+                                    <a class="nav-link mb-sm-3 mb-md-0" data-toggle="tab" role="tab"
+                                       id="{{ 'nav_'.clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}"
+                                       href="#{{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">{{ $category->name }}</a>
+                                </li>
+                            @endif
+                        @endforeach
+                    </ul>
 
-        @if(!$restorant->categories->isEmpty())
-        <nav class="tabbable sticky" style="top: {{ config('app.isqrsaas') ? 72:80 }}px;">
-                <ul class="nav nav-pills bg-white mb-2 p-2" style="gap: 10px">
-                    <li class="nav-item nav-item-category ">
-                        <a class="nav-link  mb-sm-3 mb-md-0 active" data-toggle="tab" role="tab" href="">{{ __('All categories') }}</a>
-                    </li>
-                    @foreach ( $restorant->categories as $key => $category)
-                        @if(!$category->aitems->isEmpty())
-                            <li class="nav-item nav-item-category" id="{{ 'cat_'.clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">
-                                <a class="nav-link mb-sm-3 mb-md-0" data-toggle="tab" role="tab" id="{{ 'nav_'.clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}" href="#{{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">{{ $category->name }}</a>
-                            </li>
-                        @endif
-                    @endforeach
-                </ul>
 
-
-            </nav>
-
+                </nav>
 
             @endif
 
@@ -144,69 +181,79 @@
 
 
             @if(!$restorant->categories->isEmpty())
-            @foreach ( $restorant->categories as $key => $category)
-                @if(!$category->aitems->isEmpty())
-                <div id="{{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}" class="{{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">
-                    <h1>{{ $category->name }}</h1><br />
-                </div>
-                @endif
-                <div class="grid-4 {{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">
-                    @foreach ($category->aitems as $item)
-{{--col-6 col-sm-6 --}}
-                        <div class="meal-container">
-                            <div class="strip">
-                                @if(!empty($item->image))
-                                <figure>
-                                    <a onClick="setCurrentItem({{ $item->id }})" href="javascript:void(0)"><img src="{{ asset($item->image) }}" loading="lazy" data-src="{{ config('global.restorant_details_image') }}" class="img-fluid lazy" alt=""></a>
-                                </figure>
-                                @endif
-                                
-                                @if(empty($item->image))
-                                <figure>
-                                    
-                                    <img style="object-fit: contain;" src="{{asset('no-results-2969401.png')}}" alt="">
-                                    
-                                </figure>
-                                @endif
-                                
-                                <div class="border border-top-0 border-1 p-2 rounded-2 meal-desc">
-                                    <div class="res_title"><a onClick="setCurrentItem({{ $item->id }})" style="font-weight: 700; color: #f6ac3d;" href="javascript:void(0)">{{ $item->name }}</a></div>
-                                    <div class="res_description" style="font-size: 10px;">{{ $item->short_description}}</div>
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="res_mimimum">
-                                                @if ($item->discounted_price>0)
-                                                    <span class="text-muted" style="text-decoration: line-through; color: #f6ac3d;">@money($item->discounted_price, config('settings.cashier_currency'),config('settings.do_convertion'))</span>
-                                                @endif
-                                                <span  style="font-weight: 500; color: #f6ac3d">@money($item->price, config('settings.cashier_currency'),config('settings.do_convertion'))</span>
+                @foreach ( $restorant->categories as $key => $category)
+                    @if(!$category->aitems->isEmpty())
+                        <div id="{{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}"
+                             class="{{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">
+                            <h1>{{ $category->name }}</h1><br/>
+                        </div>
+                    @endif
+                    <div class="grid-4 {{ clean(str_replace(' ', '', strtolower($category->name)).strval($key)) }}">
+                        @foreach ($category->aitems as $item)
+                            {{--col-6 col-sm-6 --}}
+                            <div class="meal-container">
+                                <div class="strip">
+                                    @if(!empty($item->image))
+                                        <figure>
+                                            <a onClick="setCurrentItem({{ $item->id }})" href="javascript:void(0)">
+                                                <img id="image" src="{{ asset($item->image_url) }}" loading="lazy"
+                                                    data-src="{{ config('global.restorant_details_image') }}"
+                                                    class="img-fluid lazy" alt="">
+                                            </a>
+                                        </figure>
+                                    @endif
+
+                                    @if(empty($item->image))
+                                        <figure>
+                                            <img style="object-fit: contain;" src="{{asset('no-results-2969401.png')}}"
+                                                 alt="">
+                                        </figure>
+                                    @endif
+
+                                    <div class="border border-top-0 border-1 p-2 rounded-2 meal-desc">
+                                        <div class="res_title"><a onClick="setCurrentItem({{ $item->id }})"
+                                                                  style="font-weight: 700; color: #f6ac3d;"
+                                                                  href="javascript:void(0)">{{ $item->name }}</a></div>
+                                        <div class="res_description"
+                                             style="font-size: 10px;">{{ $item->short_description}}</div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="res_mimimum">
+                                                    @if ($item->discounted_price>0)
+                                                        <span class="text-muted"
+                                                              style="text-decoration: line-through; color: #f6ac3d;">@money($item->discounted_price, config('settings.cashier_currency'),config('settings.do_convertion'))</span>
+                                                    @endif
+                                                    <span style="font-weight: 500; color: #f6ac3d">@money($item->price, config('settings.cashier_currency'),config('settings.do_convertion'))</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="allergens" style="text-align: right;">
-                                                @foreach ($item->allergens as $allergen)
-                                                    <div class='allergen' data-toggle="tooltip" data-placement="bottom" title="{{$allergen->title}}" >
-                                                        <img  src="{{$allergen->image_link}}" />
-                                                    </div>
-                                                @endforeach
+                                            <div class="col-6">
+                                                <div class="allergens" style="text-align: right;">
+                                                    @foreach ($item->allergens as $allergen)
+                                                        <div class='allergen' data-toggle="tooltip"
+                                                             data-placement="bottom" title="{{$allergen->title}}">
+                                                            <img src="{{$allergen->image_link}}"/>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+
+
                                 </div>
-
-
-
                             </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endforeach
+                        @endforeach
+                    </div>
+                @endforeach
             @else
                 <div class="row">
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                         <p class="text-muted mb-0">{{ __('Hmmm... Nothing found!')}}</p>
                         <br/><br/><br/>
                         <div class="text-center" style="opacity: 0.2;">
-                            <img src="https://www.jing.fm/clipimg/full/256-2560623_juice-clipart-pizza-box-pizza-box.png" width="200" height="200"></img>
+                            <img
+                                src="https://www.jing.fm/clipimg/full/256-2560623_juice-clipart-pizza-box-pizza-box.png"
+                                width="200" height="200"></img>
                         </div>
                     </div>
                 </div>
@@ -217,14 +264,15 @@
                 <!-- Check if there is value -->
                 @if (strlen($restorant->getConfig('impressum_value',''))>5)
                     <h3>{{  __($restorant->getConfig('impressum_title','')) }}</h3>
-                    <?php echo __($restorant->getConfig('impressum_value','')); ?>
+                        <?php echo __($restorant->getConfig('impressum_value', '')); ?>
                 @endif
             @endif
 
         </div>
 
         @if(  !(isset($canDoOrdering)&&!$canDoOrdering)   )
-            <div onClick="openNav()" class="callOutShoppingButtonBottom icon icon-shape bg-gradient-red text-white rounded-circle shadow mb-4">
+            <div onClick="openNav()"
+                 class="callOutShoppingButtonBottom icon icon-shape bg-gradient-red text-white rounded-circle shadow mb-4">
                 <i class="ni ni-cart"></i>
             </div>
         @endif
@@ -244,7 +292,7 @@
                                 @if (!isset($_GET['tid']))
                                     @include('partials.fields',$fields)
                                 @else
-                                    <input type="hidden" value="{{$_GET['tid']}}" name="table_id"  id="table_id"/>
+                                    <input type="hidden" value="{{$_GET['tid']}}" name="table_id" id="table_id"/>
                                 @endif
 
 
@@ -284,18 +332,18 @@
     @section('addiitional_button_1_mobile')
         <div class="dropdown mobile_menu">
 
-            <a type="button" class="nav-link  dropdown-toggle" data-toggle="dropdown"id="navbarDropdownMenuLink2">
+            <a type="button" class="nav-link  dropdown-toggle" data-toggle="dropdown" id="navbarDropdownMenuLink2">
                 <span class="btn-inner--icon">
                   <i class="fa fa-globe"></i>
                 </span>
                 <span class="nav-link-inner--text">{{ $currentLanguage }}</span>
-              </a>
+            </a>
             <ul class="dropdown-menu" aria-labelledby="">
                 @foreach ($restorant->localmenus()->get() as $language)
                     @if ($language->language!=config('app.locale'))
                         <li>
                             <a class="dropdown-item" href="?lang={{ $language->language }}">
-                               <!-- <img src="{{ asset('images') }}/icons/flags/{{ strtoupper($language->language)}}.png" /> ---> {{$language->languageName}}
+                                <!-- <img src="{{ asset('images') }}/icons/flags/{{ strtoupper($language->language)}}.png" /> ---> {{$language->languageName}}
                             </a>
                         </li>
                     @endif
@@ -307,10 +355,10 @@
 
 @section('js')
     <script>
-        var CASHIER_CURRENCY = "<?php echo  config('settings.cashier_currency') ?>";
-        var LOCALE="<?php echo  App::getLocale() ?>";
-        var IS_POS=false;
-        var TEMPLATE_USED="<?php echo config('settings.front_end_template','defaulttemplate') ?>";
+        var CASHIER_CURRENCY = "<?php echo config('settings.cashier_currency') ?>";
+        var LOCALE = "<?php echo App::getLocale() ?>";
+        var IS_POS = false;
+        var TEMPLATE_USED = "<?php echo config('settings.front_end_template', 'defaulttemplate') ?>";
     </script>
     <script src="{{ asset('custom') }}/js/order.js"></script>
     @include('restorants.phporderinterface')

@@ -4,7 +4,7 @@
 @endsection
 @section('content')
     @include('items.partials.modals', ['restorant_id' => $restorant_id])
-    
+
     <div class="header bg-gradient-primary pb-7 pt-5 pt-md-8">
         <div class="container-fluid">
             <div class="header-body">
@@ -68,16 +68,16 @@
                             <div class="col-lg-3" >
                                 <a  data-toggle="modal" data-target="#modal-items-category" data-toggle="tooltip" data-placement="top" title="{{ __('Add new category')}}">
                                     <div class="card">
-                                        <img class="card-img-top" src="{{ asset($item->image) }}/default/add_new_item.jpg" alt="...">
+                                        <img class="card-img-top" src="{{ $item->image_url }}" alt="...">
                                         <div class="card-body">
-                                            <h3 class="card-title text-primary text-uppercase">{{ __('Add first category') }}</h3> 
+                                            <h3 class="card-title text-primary text-uppercase">{{ __('Add first category') }}</h3>
                                         </div>
                                     </div>
                                 </a>
                                 <br />
                             </div>
                         @endif
-                       
+
                         @foreach ($categories as $index => $category)
                         @if($category->active == 1)
                         <div class="alert alert-default">
@@ -110,7 +110,7 @@
                                             <span class="btn-inner--icon"><i class="fa fa-edit"></i></span>
                                         </button>
 
-                                       
+
 
                                         <form action="{{ route('categories.destroy', $category) }}" method="post">
                                             @csrf
@@ -130,7 +130,7 @@
                                                 <span class="btn-inner--icon"><i class="fas fa-arrow-up"></i></span>
                                             </a>
                                          @endif
-                                         
+
 
                                         <!-- DOWN -->
                                         @if ($index+1!=count($categories))
@@ -152,7 +152,7 @@
                                         <div class="col-lg-3">
                                             <a href="{{ route('items.edit', $item) }}">
                                                 <div class="card">
-                                                    <img class="card-img-top" src="{{ asset($item->image) }}" alt="...">
+                                                    <img class="card-img-top" src="{{ $item->image_url }}" alt="...">
                                                     <div class="card-body">
                                                         <h3 class="card-title text-primary text-uppercase">{{ $item->name }}</h3>
                                                         <p class="card-text description mt-3">{{ $item->description }}</p>
@@ -176,7 +176,7 @@
                                     <div class="col-lg-3" >
                                         <a   data-toggle="modal" data-target="#modal-new-item" data-toggle="tooltip" data-placement="top" href="javascript:void(0);" onclick=(setSelectedCategoryId({{ $category->id }}))>
                                             <div class="card">
-                                                <img class="card-img-top" src="{{ asset($item->image) }}/default/add_new_item.jpg" alt="...">
+                                                <img class="card-img-top" src="{{ $item->image_url }}" alt="...">
                                                 <div class="card-body">
                                                     <h3 class="card-title text-primary text-uppercase">{{ __('Add item') }}</h3>
                                                 </div>
@@ -204,7 +204,7 @@
     var name = $(this).attr('data-name');
 
 
-    
+
     $('#cat_name').val(name);
     $("#form-edit-category").attr("action", "/categories/"+id);
 })

@@ -53,3 +53,6 @@
         </div>
     </div>
 </div>
+<script>
+    console.log('items',this.items)
+</script>
